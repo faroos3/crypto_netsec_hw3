@@ -116,11 +116,11 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	print("from message_decryption, cipher_bit_string is: ", cipher_bit_string)
 	print("from message_decryption, cipher_bit_list is: ", cipher_bit_list)
 	L = len(cipher_bit_list)
-	r_p_helper = ((p + 1)/4)**L
-	r_p = cipher_text**r_p_helper % p
+	# r_p_helper = ((p + 1)/4)**L
+	# r_p = cipher_text**r_p_helper % p
 
-	r_q_helper = ((q+1)/4)**L
-	r_q = cipher_text**r_q_helper % q
+	# r_q_helper = ((q+1)/4)**L
+	# r_q = cipher_text**r_q_helper % q
 
 	# q_inv = modinv(q, p)
 	# p_inv = modinv(p, q)
@@ -129,21 +129,22 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	print("q is: ", q)
 	# print("p_inv is: ", p_inv)
 	# print("q_inv is: ", q_inv)
-	generated_x_0 = ((q*(b % p)*r_p) + (p*(a % q)*r_q)) % N
+	# generated_x_0 = ((q*(b % p)*r_p) + (p*(a % q)*r_q)) % N
 	b = ['0' for i in range(L)]
-	x_i = generated_x_0
+	# x_i = generated_x_0
+	x_i = 159201
 	for i in range(L):
 		b[i] = int(("{:08b}".format(x_i))[-1])
-		x_i = (x_i ** 2) % N_gen
+		x_i = (x_i ** 2) % N
 
 	message_list = ['0' for i in range(L)]
 
 	for i in range(L):
 		message_list[i] = str(int(cipher_bit_list[i]) ^ b[i])
 
-	generated_m = "".join(cipher_list)
+	generated_m = "".join(message_list)
 
-	return int(generated_m, 2)
+	return int(generated_m, 2), message_list
 
 
 
@@ -156,6 +157,8 @@ if __name__ == "__main__":
 	x_0_given = 159201
 	m_to_encrypt = '10011100000100001100' # 20-bits
 
+	print("We will be encrypted the given message", m_to_encrypt, "using Blum-Goldwasser!")
+
 	N = key_generation(p_given, q_given)
 	private_key = (p_given, q_given)
 
@@ -165,6 +168,7 @@ if __name__ == "__main__":
 
 	print("\nNow to decrypt...\n")
 
-	decrypted_m = message_decryption(cipher, p_given, q_given, N, a_given, b_given)
+	decrypted_m, decrypted_m_bits = message_decryption(cipher, p_given, q_given, N, a_given, b_given)
 
 	print("The decrypted message is: ", decrypted_m)
+	print("The decrypted_m_bits are:", "".join(decrypted_m_bits))
