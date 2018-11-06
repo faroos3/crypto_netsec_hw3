@@ -83,6 +83,7 @@ def message_encryption(m, priv_key, N_gen,x_0 = -1):
 		b[i] = int(("{:08b}".format(x_i))[-1])
 		x_i = (x_i ** 2) % N_gen
 
+	b = b[::-1]
 	# get m ready to get cipher'd 
 	m_split = [] # should be the same length as L 
 	for letter in m:
@@ -117,10 +118,14 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	print("from message_decryption, cipher_bit_list is: ", cipher_bit_list)
 	L = len(cipher_bit_list)
 	# r_p_helper = ((p + 1)/4)**L
+	r_p_helper = pow( ((p + 1)/4), L)
 	# r_p = cipher_text**r_p_helper % p
+	r_p = pow(int(cipher_text), int(r_p_helper), int(p))
 
 	# r_q_helper = ((q+1)/4)**L
+	r_q_helper = pow( ((q + 1)/4), L)
 	# r_q = cipher_text**r_q_helper % q
+	r_q = pow(int(cipher_text), int(r_q_helper), int(q))
 
 	# q_inv = modinv(q, p)
 	# p_inv = modinv(p, q)
@@ -129,10 +134,10 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	print("q is: ", q)
 	# print("p_inv is: ", p_inv)
 	# print("q_inv is: ", q_inv)
-	# generated_x_0 = ((q*(b % p)*r_p) + (p*(a % q)*r_q)) % N
+	generated_x_0 = ((q*(b % p)*r_p) + (p*(a % q)*r_q)) % N
 	b = ['0' for i in range(L)]
-	# x_i = generated_x_0
-	x_i = 159201
+	x_i = generated_x_0
+	# x_i = 159201
 	for i in range(L):
 		b[i] = int(("{:08b}".format(x_i))[-1])
 		x_i = (x_i ** 2) % N
