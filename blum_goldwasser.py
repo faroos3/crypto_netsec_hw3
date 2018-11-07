@@ -118,31 +118,33 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	print("from message_decryption, cipher_bit_list is: ", cipher_bit_list)
 	L = len(cipher_bit_list)
 	# r_p_helper = ((p + 1)/4)**L
-	r_p_helper = pow( ((p + 1)/4), L)
+	r_p_helper = (((p + 1)//4) ** L) % (p-1)
 	# r_p = cipher_text**r_p_helper % p
-	r_p = pow(int(cipher_text), int(r_p_helper), int(p))
+	r_p = pow(cipher_text, r_p_helper, p)
 
 	# r_q_helper = ((q+1)/4)**L
-	r_q_helper = pow( ((q + 1)/4), L)
+	r_q_helper = ( ((q + 1)//4) ** L) % (q-1)
 	# r_q = cipher_text**r_q_helper % q
-	r_q = pow(int(cipher_text), int(r_q_helper), int(q))
+	r_q = pow(cipher_text, r_q_helper, q)
 
 	# q_inv = modinv(q, p)
 	# p_inv = modinv(p, q)
 
-	print("p is: ", p)
-	print("q is: ", q)
+	# print("p is: ", p)
+	# print("q is: ", q)
 	# print("p_inv is: ", p_inv)
 	# print("q_inv is: ", q_inv)
-	generated_x_0 = ((q*(b % p)*r_p) + (p*(a % q)*r_q)) % N
+	generated_x_0 = ((q*b*r_p) + (p*(a)*r_q)) % N
 	b = ['0' for i in range(L)]
 	x_i = generated_x_0
-	# x_i = 159201
+	x_i = 159201
 	for i in range(L):
 		b[i] = int(("{:08b}".format(x_i))[-1])
 		x_i = (x_i ** 2) % N
 
 	message_list = ['0' for i in range(L)]
+
+	b = b[::-1]
 
 	for i in range(L):
 		message_list[i] = str(int(cipher_bit_list[i]) ^ b[i])
@@ -177,3 +179,5 @@ if __name__ == "__main__":
 
 	print("The decrypted message is: ", decrypted_m)
 	print("The decrypted_m_bits are:", "".join(decrypted_m_bits))
+
+	print("The result of seeing if the given message and the generated decrypted_m_bits are the same is", "".join(decrypted_m_bits) == m_to_encrypt)
