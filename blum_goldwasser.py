@@ -101,9 +101,9 @@ def message_encryption(m, priv_key, N_gen,x_0 = -1):
 
 	ciphertext = "".join(cipher_list)
 
-	return int(ciphertext, 2), cipher_list
+	return int(ciphertext, 2), cipher_list, x_i
 
-def message_decryption(cipher_text, p, q, N, a, b):
+def message_decryption(cipher_text, p, q, N, a, b, x_l):
 	'''
 	given a ciphertext, Alice reveives y, and can probably turn it into bits 
 	NOTE: We're using 20 bits, so make sure to convert bits in terms of that. 
@@ -117,15 +117,15 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	print("from message_decryption, cipher_bit_string is: ", cipher_bit_string)
 	print("from message_decryption, cipher_bit_list is: ", cipher_bit_list)
 	L = len(cipher_bit_list)
-	# r_p_helper = ((p + 1)/4)**L
+
 	r_p_helper = (((p + 1)//4) ** L) % (p-1)
-	# r_p = cipher_text**r_p_helper % p
-	r_p = pow(cipher_text, r_p_helper, p)
+
+	r_p = pow(x_l, r_p_helper, p)
 
 	# r_q_helper = ((q+1)/4)**L
 	r_q_helper = ( ((q + 1)//4) ** L) % (q-1)
 	# r_q = cipher_text**r_q_helper % q
-	r_q = pow(cipher_text, r_q_helper, q)
+	r_q = pow(x_l, r_q_helper, q)
 
 	# q_inv = modinv(q, p)
 	# p_inv = modinv(p, q)
@@ -134,10 +134,10 @@ def message_decryption(cipher_text, p, q, N, a, b):
 	# print("q is: ", q)
 	# print("p_inv is: ", p_inv)
 	# print("q_inv is: ", q_inv)
-	generated_x_0 = ((q*b*r_p) + (p*(a)*r_q)) % N
+	generated_x_0 = (q*b*r_p + p*a*r_q) % N
 	b = ['0' for i in range(L)]
 	x_i = generated_x_0
-	x_i = 159201
+
 	for i in range(L):
 		b[i] = int(("{:08b}".format(x_i))[-1])
 		x_i = (x_i ** 2) % N
@@ -169,13 +169,13 @@ if __name__ == "__main__":
 	N = key_generation(p_given, q_given)
 	private_key = (p_given, q_given)
 
-	cipher, cipher_bits = message_encryption(m_to_encrypt, private_key, N, x_0_given)
+	cipher, cipher_bits, x_L = message_encryption(m_to_encrypt, private_key, N, x_0_given)
 	print("Cipher is :", cipher)
 	print("cipher_bits is: ", cipher_bits)
 
 	print("\nNow to decrypt...\n")
 
-	decrypted_m, decrypted_m_bits = message_decryption(cipher, p_given, q_given, N, a_given, b_given)
+	decrypted_m, decrypted_m_bits = message_decryption(cipher, p_given, q_given, N, a_given, b_given, x_L)
 
 	print("The decrypted message is: ", decrypted_m)
 	print("The decrypted_m_bits are:", "".join(decrypted_m_bits))
